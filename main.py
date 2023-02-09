@@ -17,53 +17,94 @@
 
 ## script start
 
+import sqlite3
+
+
+# TODO: import matplotlib
+# import matplotlib
+
+def opt1():
+	sql = "SELECT\n" \
+		  "Station_ID as ID,\n" \
+		  "Station_Name as name\n" \
+		  "from Stations\n" \
+		  "group by name\n" \
+		  "having name like ?\n" \
+		  "order by name asc;\n"
+	inp = input("Enter partial station name (wildcards _ and %):")
+
+	dbCursor.execute(sql, [inp])
+
+	for row in dbCursor:
+		print(row[0], " : ", row[1])
+
+		#print(row[0], end="")
+		#for col in row[1:]:
+		#	print(" : " + col, end="")
+		#print("", end="\n")
+
+
+def opt2():
+
+	sql = "SELECT \n" \
+		  "        sum(Num_Riders) as totalNumRiders\n" \
+		  "from Ridership r\n" \
+		  ";"
+
+	total = float(dbCursor.execute(sql).fetchone()[0])
+
+	sql = "SELECT \n" \
+		  "        s.Station_Name, \n" \
+		  "        sum(Num_Riders) as total\n" \
+		  "from Ridership r\n" \
+		  "inner join Stations s on s.Station_ID=r.Station_ID\n" \
+		  "group by s.Station_ID\n" \
+		  "order by total asc\n" \
+		  "\n"
+
+	output = dbCursor.execute(sql)
+
+	for row in output:
+		print(row[0], ":", f"{row[1]:,}", f"({row[1]/total:.2f}%)")
 
 def handleMenu():
-    menuOption = -1
+	# menu_option = input("Please enter a command (1-9, x to exit): ")
+	menu_option = "2"
+	print("u selected")
+	print(menu_option)
 
-    menuOption = input("Please Enter A command ...")
+	if menu_option == "x":
+		quit()
 
-    print("u selected")
-    print(menuOption)
+	elif menu_option == "1":
+		opt1()
 
-    if (menuOption == "x"):
-        quit()
+	elif menu_option == "2":
+		opt2()
 
-    elif (menuOption == "1"):
-        print("menuu opt 1")
+	elif menu_option == "3":
+		print("menuu opt 3")
 
-    elif (menuOption == "opt 2"):
-        print("menuu opt 2")
+	elif menu_option == "4":
+		print("menuu opt 4")
 
-		3    elif (menuOption == "opt 2"):
-        print("menuu opt 2")
-		4    elif (menuOption == "opt 2"):
-        print("menuu opt 2")
-		5    elif (menuOption == "opt 2"):
-        print("menuu opt 2")
-		6    elif (menuOption == "opt 2"):
-        print("menuu opt 2")
-		7    elif (menuOption == "opt 2"):
-        print("menuu opt 2")
-		8    elif (menuOption == "opt 2"):
-        print("menuu opt 2")
-		9    elif (menuOption == "opt 2"):
-        print("menuu opt 2")
+	elif menu_option == "5":
+		print("menuu opt 5")
 
+	elif menu_option == "6":
+		print("menuu opt 6")
 
+	elif menu_option == "7":
+		print("menuu opt 7")
 
+	elif menu_option == "8":
+		print("menuu opt 8")
 
+	elif menu_option == "9":
+		print("menuu opt 9")
 
-
-
-
-
-
-
-
-    else:
-        print("else Fuuuk")
-
+	else:
+		print("**Error, unknown command, try again...")
 
 
 ## equivalent of main()
@@ -71,16 +112,19 @@ def handleMenu():
 
 print("** Welcome to CTA L analysis app **")
 
+dbConn = sqlite3.connect("CTA2_L_daily_ridership.db")
+dbCursor = dbConn.cursor()
+
 print("General stats:\n" +
-      "  # of stations: 147\n" +
-      "  # of stops: 302\n" +
-      "  # of ride entries: 1,070,894\n" +
-      "  date range: 2001-01-01 - 2021-07-31\n" +
-      "  Total ridership: 3,377,404,512\n" +
-      "  Weekday ridership: 2,778,644,946 (82.27%)\n" +
-      "  Saturday ridership: 330,165,977 (9.78%)\n" +
-      "  Sunday/holiday ridership: 268,593,589 (7.95%\n)"
-      )
+	  "  # of stations: 147\n" +
+	  "  # of stops: 302\n" +
+	  "  # of ride entries: 1,070,894\n" +
+	  "  date range: 2001-01-01 - 2021-07-31\n" +
+	  "  Total ridership: 3,377,404,512\n" +
+	  "  Weekday ridership: 2,778,644,946 (82.27%)\n" +
+	  "  Saturday ridership: 330,165,977 (9.78%)\n" +
+	  "  Sunday/holiday ridership: 268,593,589 (7.95%\n)"
+	  )
 
 while True:
-    handleMenu()
+	handleMenu()
