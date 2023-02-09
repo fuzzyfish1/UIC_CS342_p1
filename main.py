@@ -38,12 +38,6 @@ def opt1():
 	for row in dbCursor:
 		print(row[0], " : ", row[1])
 
-		#print(row[0], end="")
-		#for col in row[1:]:
-		#	print(" : " + col, end="")
-		#print("", end="\n")
-
-
 def opt2():
 
 	sql = "SELECT \n" \
@@ -67,11 +61,32 @@ def opt2():
 	for row in output:
 		print(row[0], ":", f"{row[1]:,}", f"({row[1]/total:.2f}%)")
 
+def opt3():
+	pass
+
+def opt4():
+	pass
+
+def opt5():
+	pass
+
+def opt6():
+	pass
+
+def opt7():
+	pass
+
+def opt8():
+	pass
+
+def opt9():
+	pass
+
 def handleMenu():
-	# menu_option = input("Please enter a command (1-9, x to exit): ")
-	menu_option = "2"
-	print("u selected")
-	print(menu_option)
+	menu_option = input("Please enter a command (1-9, x to exit): ")
+	#menu_option = "2"
+	#print("u selected")
+	#print(menu_option)
 
 	if menu_option == "x":
 		quit()
@@ -83,25 +98,25 @@ def handleMenu():
 		opt2()
 
 	elif menu_option == "3":
-		print("menuu opt 3")
+		opt3()
 
 	elif menu_option == "4":
-		print("menuu opt 4")
+		opt4()
 
 	elif menu_option == "5":
-		print("menuu opt 5")
+		opt5()
 
 	elif menu_option == "6":
-		print("menuu opt 6")
+		opt6()
 
 	elif menu_option == "7":
-		print("menuu opt 7")
+		opt7()
 
 	elif menu_option == "8":
-		print("menuu opt 8")
+		opt8()
 
 	elif menu_option == "9":
-		print("menuu opt 9")
+		opt9()
 
 	else:
 		print("**Error, unknown command, try again...")
