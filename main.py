@@ -31,7 +31,6 @@ def riderShip(ascending = True, orderByName=True, limit = False):
 
 	#total = dbCursor.execute(sql).arraysize
 	total = float(dbCursor.execute(sql).fetchone()[0])
-	print(total)
 
 	sql = "SELECT \n" \
 		  "        s.Station_Name, \n" \
