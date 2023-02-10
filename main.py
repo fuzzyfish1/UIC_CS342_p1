@@ -23,6 +23,35 @@ import sqlite3
 # TODO: import matplotlib
 # import matplotlib
 
+def riderShip(ascending = True, orderByName=True, limit = False):
+	sql = "SELECT \n" \
+		  "        sum(Num_Riders) as totalNumRiders\n" \
+		  "from Ridership r\n" \
+		  ";"
+
+	#total = dbCursor.execute(sql).arraysize
+	total = float(dbCursor.execute(sql).fetchone()[0])
+	print(total)
+
+	sql = "SELECT \n" \
+		  "        s.Station_Name, \n" \
+		  "        sum(Num_Riders) as total\n" \
+		  "from Ridership r\n" \
+		  "inner join Stations s on s.Station_ID=r.Station_ID\n" \
+		  "group by s.Station_ID\n"\
+		  "order by "
+
+
+	sql += "Station_Name " if orderByName else "total "
+	sql += "asc\n" if ascending else "desc\n"
+
+	sql += "limit 10;" if limit else ";"
+
+	output = dbCursor.execute(sql)
+
+	for row in output:
+		print(row[0], ":", f"{row[1]:,}", f"({100.0* row[1] / total:.2f}%)")
+
 def opt1():
 	sql = "SELECT\n" \
 		  "Station_ID as ID,\n" \
@@ -38,34 +67,6 @@ def opt1():
 	for row in dbCursor:
 		print(row[0], " : ", row[1])
 
-def opt2():
-
-	sql = "SELECT \n" \
-		  "        sum(Num_Riders) as totalNumRiders\n" \
-		  "from Ridership r\n" \
-		  ";"
-
-	total = float(dbCursor.execute(sql).fetchone()[0])
-
-	sql = "SELECT \n" \
-		  "        s.Station_Name, \n" \
-		  "        sum(Num_Riders) as total\n" \
-		  "from Ridership r\n" \
-		  "inner join Stations s on s.Station_ID=r.Station_ID\n" \
-		  "group by s.Station_ID\n" \
-		  "order by total asc\n" \
-		  "\n"
-
-	output = dbCursor.execute(sql)
-
-	for row in output:
-		print(row[0], ":", f"{row[1]:,}", f"({row[1]/total:.2f}%)")
-
-def opt3():
-	pass
-
-def opt4():
-	pass
 
 def opt5():
 	pass
@@ -95,13 +96,13 @@ def handleMenu():
 		opt1()
 
 	elif menu_option == "2":
-		opt2()
+		riderShip(ascending = True, orderByName=True, limit = False)
 
 	elif menu_option == "3":
-		opt3()
+		riderShip(ascending = False, orderByName=False, limit=True)
 
 	elif menu_option == "4":
-		opt4()
+		riderShip(ascending = True, orderByName=False, limit=True)
 
 	elif menu_option == "5":
 		opt5()
@@ -138,7 +139,7 @@ print("General stats:\n" +
 	  "  Total ridership: 3,377,404,512\n" +
 	  "  Weekday ridership: 2,778,644,946 (82.27%)\n" +
 	  "  Saturday ridership: 330,165,977 (9.78%)\n" +
-	  "  Sunday/holiday ridership: 268,593,589 (7.95%\n)"
+	  "  Sunday/holiday ridership: 268,593,589 (7.95%)\n"
 	  )
 
 while True:
