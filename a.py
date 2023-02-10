@@ -1,0 +1,8 @@
+print("0")
+print("3")
+print("10")
+print("1")
+print("HOWARD")
+print("help")
+print("4")
+print("x")
