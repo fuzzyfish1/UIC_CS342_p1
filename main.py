@@ -83,7 +83,7 @@ def opt9():
 	pass
 
 def handleMenu():
-	menu_option = input("Please enter a command (1-9, x to exit): ")
+	menu_option = input("Please enter a command (1-9, x to exit): \n")
 	#menu_option = "2"
 	#print("u selected")
 	#print(menu_option)
