@@ -141,6 +141,7 @@ def handleMenu():
 		opt1()
 
 	elif menu_option == "2":
+		print("** ridership all stations **")
 		riderShip(ascending=True, orderByName=True, limit=False)
 
 	elif menu_option == "3":
