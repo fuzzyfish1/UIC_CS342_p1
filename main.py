@@ -16,7 +16,6 @@ import sqlite3
 # TODO: import matplotlib
 import matplotlib.pyplot as plt
 
-
 def riderShip(ascending=True, orderByName=True, limit=False):
 	sql = "SELECT \n" \
 		  "        sum(Num_Riders) as totalNumRiders\n" \
@@ -43,7 +42,6 @@ def riderShip(ascending=True, orderByName=True, limit=False):
 	for row in output:
 		print(row[0], ":", f"{row[1]:,}", f"({100.0 * row[1] / total:.2f}%)")
 
-
 def opt1():
 	sql = "SELECT\n" \
 		  "Station_ID as ID,\n" \
@@ -54,14 +52,13 @@ def opt1():
 		  "order by name asc;\n"
 	inp = input("\nEnter partial station name (wildcards _ and %): ")
 
-	dbCursor.execute(sql, [inp])
+	output = dbCursor.execute(sql, [inp]).fetchall()
 
-	if dbCursor.arraysize == 0:
+	if len(output) == 0:
 		print("**No stations found...")
 
-	for row in dbCursor:
+	for row in output:
 		print(row[0], ":", row[1])
-
 
 def opt5():
 	color = input("Enter a line color (e.g. Red or Yellow): ")
