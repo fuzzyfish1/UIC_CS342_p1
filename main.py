@@ -61,9 +61,7 @@ def opt1():
 		print(row[0], ":", row[1])
 
 def opt5():
-	color = input("Enter a line color (e.g. Red or Yellow): ")
-
-	print(color)
+	color = input("\nEnter a line color (e.g. Red or Yellow): ")
 
 	sql = "SELECT \n" \
 		  "        s.Stop_Name as name, \n" \
@@ -77,6 +75,9 @@ def opt5():
 		  "order by l.Color asc;"
 
 	output = dbCursor.execute(sql, [color])
+
+	if len(output) == 0:
+		print("**No such line...")
 
 	for row in output:
 		print(row[0], ":", "direction =", row[1], "(accessible?", "yes)" if row[2] == 1 else "no)")
@@ -159,6 +160,7 @@ def handleMenu():
 		riderShipOverTime()
 
 	elif menu_option == "7":
+		print("** ridership by year **")
 		riderShipOverTime(month=False)
 
 	elif menu_option == "8":
