@@ -110,7 +110,7 @@ def riderShipOverTime(month=True):
 		y.append(row[1])
 
 	# plotting ---
-	plot = input("Plot? (y/n) ")
+	plot = input("Plot? (y/n)\n")
 
 	if plot == "y":
 
