@@ -1,20 +1,21 @@
-## -----------------------------------------------
-##	Program 1: Analyzing CTA2 L data in Python
-##		program takes user inputs to query SQLite Database
+# -----------------------------------------------
+#	Program 1: Analyzing CTA2 L data in Python
+#		program takes user inputs to query SQLite Database
 
-##	Course: CS341, Fall 2023. MWF 12pm lec
+#	Course: CS341, Fall 2023. MWF 12pm lec
 
-##	System: Ubuntu using terminal,
-##		Python 3.10.6
-##		sqlite3 3.37.2
+#	System: Ubuntu using terminal,
+#		Python 3.10.6
+#		sqlite3 3.37.2
 
-##	Author: Zain Ali
-## -----------------------------------------------
+#	Author: Zain Ali
+# -----------------------------------------------
 
 import sqlite3
 
 # TODO: import matplotlib
-import matplotlib
+import matplotlib.pyplot as plt
+
 
 def riderShip(ascending=True, orderByName=True, limit=False):
 	sql = "SELECT \n" \
@@ -22,7 +23,6 @@ def riderShip(ascending=True, orderByName=True, limit=False):
 		  "from Ridership r\n" \
 		  ";"
 
-	# total = dbCursor.execute(sql).arraysize
 	total = float(dbCursor.execute(sql).fetchone()[0])
 
 	sql = "SELECT \n" \
@@ -43,6 +43,7 @@ def riderShip(ascending=True, orderByName=True, limit=False):
 	for row in output:
 		print(row[0], ":", f"{row[1]:,}", f"({100.0 * row[1] / total:.2f}%)")
 
+
 def opt1():
 	sql = "SELECT\n" \
 		  "Station_ID as ID,\n" \
@@ -55,50 +56,74 @@ def opt1():
 
 	dbCursor.execute(sql, [inp])
 
+	if dbCursor.arraysize == 0:
+		print("**No stations found...")
+
 	for row in dbCursor:
 		print(row[0], ":", row[1])
 
-	print("\n")
 
 def opt5():
-	'''Please enter a command (1-9, x to exit): 5
-	Enter a line color (e.g. Red or Yellow): yellow
-	Dempster-Skokie (Arrival) : direction = N (accessible? yes)
-	Dempster-Skokie (Howard-bound) : direction = S (accessible? yes)
-	Howard (Linden & Skokie-bound) : direction = N (accessible? yes)
-	Howard (Terminal arrival) : direction = S (accessible? yes)
-	Oakton-Skokie (Dempster-Skokie-bound) : direction = N (accessible? yes)
-	Oakton-Skokie (Howard-bound) : direction = S (accessible? yes)
-	Please enter a command (1-9, x to exit): 5
-	Enter a line color (e.g. Red or Yellow): Magenta
-	**No such line...'''
-
 	color = input("Enter a line color (e.g. Red or Yellow): ")
+
+	print(color)
 
 	sql = "SELECT \n" \
 		  "        s.Stop_Name as name, \n" \
-		  "        s.Direction, \n" \
-		  "        s.ADA \n" \
+		  "        s.Direction as dirn, \n" \
+		  "        s.ADA as access\n" \
 		  "from Stops s \n" \
 		  "inner join StopDetails sd on s.Stop_ID=sd.Stop_ID\n" \
 		  "inner join Lines l on l.Line_ID=sd.Line_ID\n" \
-		  "group by name;\n" \
-		  "having name like ?\n" \
-		  "order by name asc;\n"
+		  "group by name\n" \
+		  "having l.Color like ?\n" \
+		  "order by l.Color asc;"
 
 	output = dbCursor.execute(sql, [color])
 
 	for row in output:
-		#print(row[0], ":", f"{row[1]:,}", f"({100.0 * row[1] / total:.2f}%)")
-		print(row)
-
-def opt6():
-	pass
+		print(row[0], ":", "direction =", row[1], "(accessible?", "yes)" if row[2] == 1 else "no)")
 
 
-def opt7():
-	pass
+def riderShipOverTime(month=True):
+	# helps set format for query as year or month
+	if month:
+		t = "m"
+	else:
+		t = "Y"
 
+	sql = "SELECT \n" \
+		  "        STRFTIME(\"%" + t + "\", r.Ride_Date) as t,\n" \
+									   "		 sum(Num_Riders) as ridersPerMonth\n" \
+									   "from Ridership r\n" \
+									   "group by STRFTIME(\"%" + t + "\", r.Ride_Date)\n" \
+									   "order by t asc" \
+									   ";"
+
+	output = dbCursor.execute(sql).fetchall()
+
+	x = []
+	y = []
+
+	for row in output:
+		print(row[0], ":", f'{row[1]:,}')
+
+		x.append(str(row[0])[-2:]) # forces only last 2 digits of year/month
+		y.append(row[1])
+
+	# plotting ---
+	plot = input("Plot? (y/n) ")
+
+	if plot == "y":
+
+		timeFrame = "month" if month else "year"
+
+		plt.xlabel(timeFrame)
+		plt.ylabel("number of riders (x * 10 ^ 8)")
+		plt.title(timeFrame + "ly ridership")
+
+		plt.plot(x, y)
+		plt.show()
 
 def opt8():
 	pass
@@ -133,10 +158,10 @@ def handleMenu():
 		opt5()
 
 	elif menu_option == "6":
-		opt6()
+		riderShipOverTime()
 
 	elif menu_option == "7":
-		opt7()
+		riderShipOverTime(month=False)
 
 	elif menu_option == "8":
 		opt8()
@@ -148,21 +173,56 @@ def handleMenu():
 		print("**Error, unknown command, try again...\n")
 
 
-print("** Welcome to CTA L analysis app **\n\n" +
-	  "General stats:\n" +
-	  "  # of stations: 147\n" +
-	  "  # of stops: 302\n" +
-	  "  # of ride entries: 1,070,894\n" +
-	  "  date range: 2001-01-01 - 2021-07-31\n" +
-	  "  Total ridership: 3,377,404,512\n" +
-	  "  Weekday ridership: 2,778,644,946 (82.27%)\n" +
-	  "  Saturday ridership: 330,165,977 (9.78%)\n" +
-	  "  Sunday/holiday ridership: 268,593,589 (7.95%)\n"
-	  )
+def genStats():
+	# sql by type of day
+	sql = "SELECT \n" \
+		  "        sum(Num_Riders) as totalNumRiders,\n" \
+		  "		   Type_of_Day as tod,\n" \
+		  "		   count(Num_Riders) as entryCount\n" \
+		  "from Ridership r\n" \
+		  "group by Type_of_Day\n" \
+		  "order by tod asc" \
+		  ";"
+
+	weekTotals = dbCursor.execute(sql).fetchall()
+
+	# sql for general ridership statistics
+	sql = "SELECT \n" \
+		  "        STRFTIME(\"%Y-%m-%d\",Min(Ride_Date)) as earliestDate,\n" \
+		  "		   STRFTIME(\"%Y-%m-%d\",Max(Ride_Date)) as latestDate,\n" \
+		  "		   count(Num_Riders) as entryCount,\n" \
+		  "		   sum(Num_Riders) as total\n" \
+		  "from Ridership r" \
+		  ";"
+
+	rideSummary = dbCursor.execute(sql).fetchone()
+
+	earliestDate = rideSummary[0]
+	latestDate = rideSummary[1]
+	totalEntries = rideSummary[2]
+	total = rideSummary[3]
+
+	# not in ridership
+	numStops = dbCursor.execute("SELECT count(distinct Stop_ID) from Stops;").fetchone()[0]
+	numStations = dbCursor.execute("SELECT count(distinct Station_ID) from Stations;").fetchone()[0]
+
+	print("** Welcome to CTA L analysis app **\n\n" +
+		  "General stats:\n" +
+		  "  # of stations: " + str(numStations) + "\n" +
+		  "  # of stops: " + str(numStops) + "\n" +
+		  "  # of ride entries: " + f'{totalEntries:,}\n' +
+		  "  date range: " + earliestDate + " - " + latestDate + "\n" +
+		  "  Total ridership: " + f'{total:,}' + "\n" +
+		  "  Weekday ridership: " + f'{weekTotals[2][0]:,}' + " (" + f"{100.0 * weekTotals[2][0] / total:.2f}%)\n" +
+		  "  Saturday ridership: " + f'{weekTotals[0][0]:,}' + " (" + f"{100.0 * weekTotals[0][0] / total:.2f}%)\n" +
+		  "  Sunday/holiday ridership: " + f'{weekTotals[1][0]:,}' + " (" + f"{100.0 * weekTotals[1][0] / total:.2f}%)\n"
+		  )
+
 
 dbConn = sqlite3.connect("CTA2_L_daily_ridership.db")
 dbCursor = dbConn.cursor()
 
+genStats()
+
 while True:
 	handleMenu()
-
