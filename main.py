@@ -92,11 +92,11 @@ def riderShipOverTime(month=True):
 
 	sql = "SELECT \n" \
 		  "        STRFTIME(\"%" + t + "\", r.Ride_Date) as t,\n" \
-									   "		 sum(Num_Riders) as ridersPerMonth\n" \
-									   "from Ridership r\n" \
-									   "group by STRFTIME(\"%" + t + "\", r.Ride_Date)\n" \
-									   "order by t asc" \
-									   ";"
+		"		 sum(Num_Riders) as ridersPerMonth\n" \
+		"from Ridership r\n" \
+		"group by STRFTIME(\"%" + t + "\", r.Ride_Date)\n" \
+		"order by t asc" \
+		";"
 
 	output = dbCursor.execute(sql).fetchall()
 
@@ -124,52 +124,78 @@ def riderShipOverTime(month=True):
 		plt.show()
 
 def opt8():
-	'''Inputs a year and the names of two stations (full or partial names), and then outputs the daily ridership at
-	each station for that year. Since the output would be quite long, you should only output the first 5 days and
-	last 5 days of data for each station (as shown below):
-	Please enter a command (1-9, x to exit): 8
-	Year to compare against? 2020
-	Enter station 1 (wildcards _ and %): %uic%
-	Enter station 2 (wildcards _ and %): %sox%
-	Station 1: 40350 UIC-Halsted
-	2020-01-01 958
-	2020-01-02 2143
-	2020-01-03 2215
-	2020-01-04 1170
-	2020-01-05 840
-	2020-12-27 327
-	2020-12-28 426
-	2020-12-29 438
-	2020-12-30 429
-	2020-12-31 363
-	Station 2: 40190 Sox-35th-Dan Ryan'''
 
-	year = input("Year to compare against?")
-	s1 = input("Enter station 1 (wildcards _ and %): ")
-	s2 = input("Enter station 2 (wildcards _ and %): ")
 
-	sql = "SELECT Ride_Date as date, Num_Riders\n"\
+	year = input("Year to compare against?\n")
+	s1 = input("Enter station 1 (wildcards _ and %): \n")
+
+	sql = "SELECT * FROM \n"\
+		  "(SELECT STRFTIME(\"%Y-%M-%D\",r.Ride_Date) as date, r.Num_Riders, r.Station_ID, s.Station_Name\n"\
 		  "FROM Ridership r\n" \
-		  "inner join Stations s on s.Station_ID=r.Station_ID\n"\
+		  "CROSS JOIN Stations s on s.Station_ID=r.Station_ID\n"\
 		  "WHERE s.Station_Name like \"" + s1 + "\" AND STRFTIME(\"%Y\", date) = \"" + year + "\"\n"\
 		  "ORDER BY date DESC\n"\
-		  "LIMIT 5;\n"\
-		  #"UNION ALL\n" \
-		  #"SELECT * FROM\n" \
-		  #"(SELECT Ride_Date as date, Num_Riders\n"\
-		  #"FROM Ridership\n" \
-		  #"inner join Stations s on s.Station_ID=r.Station_ID\n"\
-		  #"having (s.Station_Name like " + s2+ " AND STRFIME(\"%Y\", date) = \"" + year + "\")\n"\
-		  #"ORDER BY date ASC\n"\
-		  #"LIMIT 5);\n"
-
-	print(sql)
+		  "LIMIT 5\n)\n"\
+		  "UNION ALL \n"\
+		  "SELECT * FROM \n" \
+		  "(SELECT STRFTIME(\"%Y-%M-%D\",r.Ride_Date) as date, r.Num_Riders, r.Station_ID, s.Station_Name\n" \
+		  "FROM Ridership r\n" \
+		  "CROSS JOIN Stations s on s.Station_ID=r.Station_ID\n" \
+		  "WHERE s.Station_Name like \"" + s1 + "\" AND STRFTIME(\"%Y\", date) = \"" + year + "\"\n" \
+		  "ORDER BY date ASC\n" \
+		  "LIMIT 5\n);"
 
 	output = dbCursor.execute(sql).fetchall()
 
 	if len(output) == 0:
-		print("**No such line...")
+		print("**No station found...")
+		return
 
+	for row in output:
+		if row[2] != output[0][2]:
+			print("**Multiple stations found...")
+			return
+
+	s2 = input("Enter station 2 (wildcards _ and %): \n")
+
+	sql = "SELECT * FROM \n"\
+		  "(SELECT STRFTIME(\"%Y-%M-%D\",r.Ride_Date) as date, r.Num_Riders, r.Station_ID, s.Station_Name\n"\
+		  "FROM Ridership r\n" \
+		  "CROSS JOIN Stations s on s.Station_ID=r.Station_ID\n"\
+		  "WHERE s.Station_Name like \"" + s2 + "\" AND STRFTIME(\"%Y\", date) = \"" + year + "\"\n"\
+		  "ORDER BY date DESC\n"\
+		  "LIMIT 5\n)\n"\
+		  "UNION ALL \n"\
+		  "SELECT * FROM \n" \
+		  "(SELECT STRFTIME(\"%Y-%M-%D\",r.Ride_Date) as date, r.Num_Riders, r.Station_ID, s.Station_Name\n" \
+		  "FROM Ridership r\n" \
+		  "CROSS JOIN Stations s on s.Station_ID=r.Station_ID\n" \
+		  "WHERE s.Station_Name like \"" + s2 + "\" AND STRFTIME(\"%Y\", date) = \"" + year + "\"\n" \
+		  "ORDER BY date ASC\n" \
+		  "LIMIT 5\n);"
+
+	output2 = dbCursor.execute(sql).fetchall()
+
+	if len(output2) == 0:
+		print("**No station found...")
+		return
+
+	for row in output2:
+		if row[2] != output2[0][2]:
+			print("**Multiple stations found...")
+			return
+
+	print("Station1: ")
+	print(str(output[0][2]) + " " + str(output[0][3]))
+
+	for row in output:
+		print(str(row[0]) + " " + str(row[1]))
+
+	print("Station2: ")
+	print(str(output2[0][2]) + " " + str(output2[0][3]))
+
+	for row in output2:
+		print(str(row[0]) + " " + str(row[1]))
 
 
 
