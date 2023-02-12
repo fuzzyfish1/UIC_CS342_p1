@@ -74,7 +74,7 @@ def opt5():
 		  "having l.Color like ?\n" \
 		  "order by l.Color asc;"
 
-	output = dbCursor.execute(sql, [color])
+	output = dbCursor.execute(sql, [color]).fetchall()
 
 	if len(output) == 0:
 		print("**No such line...")
@@ -124,7 +124,53 @@ def riderShipOverTime(month=True):
 		plt.show()
 
 def opt8():
-	pass
+	'''Inputs a year and the names of two stations (full or partial names), and then outputs the daily ridership at
+	each station for that year. Since the output would be quite long, you should only output the first 5 days and
+	last 5 days of data for each station (as shown below):
+	Please enter a command (1-9, x to exit): 8
+	Year to compare against? 2020
+	Enter station 1 (wildcards _ and %): %uic%
+	Enter station 2 (wildcards _ and %): %sox%
+	Station 1: 40350 UIC-Halsted
+	2020-01-01 958
+	2020-01-02 2143
+	2020-01-03 2215
+	2020-01-04 1170
+	2020-01-05 840
+	2020-12-27 327
+	2020-12-28 426
+	2020-12-29 438
+	2020-12-30 429
+	2020-12-31 363
+	Station 2: 40190 Sox-35th-Dan Ryan'''
+
+	year = input("Year to compare against?")
+	s1 = input("Enter station 1 (wildcards _ and %): ")
+	s2 = input("Enter station 2 (wildcards _ and %): ")
+
+	sql = "SELECT Ride_Date as date, Num_Riders\n"\
+		  "FROM Ridership r\n" \
+		  "inner join Stations s on s.Station_ID=r.Station_ID\n"\
+		  "WHERE s.Station_Name like \"" + s1 + "\" AND STRFTIME(\"%Y\", date) = \"" + year + "\"\n"\
+		  "ORDER BY date DESC\n"\
+		  "LIMIT 5;\n"\
+		  #"UNION ALL\n" \
+		  #"SELECT * FROM\n" \
+		  #"(SELECT Ride_Date as date, Num_Riders\n"\
+		  #"FROM Ridership\n" \
+		  #"inner join Stations s on s.Station_ID=r.Station_ID\n"\
+		  #"having (s.Station_Name like " + s2+ " AND STRFIME(\"%Y\", date) = \"" + year + "\")\n"\
+		  #"ORDER BY date ASC\n"\
+		  #"LIMIT 5);\n"
+
+	print(sql)
+
+	output = dbCursor.execute(sql).fetchall()
+
+	if len(output) == 0:
+		print("**No such line...")
+
+
 
 
 def opt9():
