@@ -72,7 +72,7 @@ def opt5():
 		  "inner join Lines l on l.Line_ID=sd.Line_ID\n" \
 		  "group by name\n" \
 		  "having l.Color like ?\n" \
-		  "order by l.Color asc;"
+		  "order by name asc;"
 
 	output = dbCursor.execute(sql, [color]).fetchall()
 
